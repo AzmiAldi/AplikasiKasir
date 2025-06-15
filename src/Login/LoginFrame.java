@@ -2,15 +2,13 @@ package Login;
 
 import com.formdev.flatlaf.FlatLightLaf;
 import main.DashboardFrame;
+import Login.AuthController;
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
 public class LoginFrame extends JFrame {
-    private boolean authenticate(String username, String password) {
-        return (username.equals("admin") && password.equals("admin123"))
-                || (username.equals("cashier") && password.equals("cashier123"));
-    }
-
     public LoginFrame() {
 
         setTitle("Stello Coffee - Login");
@@ -96,17 +94,20 @@ public class LoginFrame extends JFrame {
         add(center, BorderLayout.CENTER);
 
         //Fungsi Login
-        loginButton.addActionListener(e -> {
-            String username = usernameField.getText();
-            String password = new String(passwordField.getPassword());
+        loginButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                String username = usernameField.getText().trim();
+                String password = String.valueOf(passwordField.getPassword()).trim();
 
-            if (authenticate(username, password)) {
-                JOptionPane.showMessageDialog(this, "Login berhasil!");
-                // Buka tampilan dashboard
-                new DashboardFrame().setVisible(true);
-                this.dispose(); // Tutup jendela login
-            } else {
-                JOptionPane.showMessageDialog(this, "Username atau password salah.", "Login Gagal", JOptionPane.ERROR_MESSAGE);
+                boolean success = AuthController.login(username, password);
+
+                if (success) {
+                    JOptionPane.showMessageDialog(null, "Login berhasil!");
+                    new DashboardFrame().setVisible(true);
+                    dispose(); // tutup form login
+                } else {
+                    JOptionPane.showMessageDialog(null, "Username atau password salah.");
+                }
             }
         });
         getRootPane().setDefaultButton(loginButton);
