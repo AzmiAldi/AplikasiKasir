@@ -1,5 +1,7 @@
 package main;
 
+import Login.LoginFrame;
+import com.formdev.flatlaf.FlatLightLaf;
 import javax.swing.*;
 import java.awt.*;
 import java.util.HashMap;
@@ -32,7 +34,7 @@ public class DashboardFrame extends JFrame {
         panelMap.put("dashboard", createPagePanel("Halaman Dashboard"));
         panelMap.put("produk", new panels.ProdukPanel());
         panelMap.put("transaksi", new panels.TransaksiPanel());
-        panelMap.put("struk", createPagePanel("Halaman Struk"));
+        panelMap.put("struk", new panels.StrukPanel());
         panelMap.put("shift", createPagePanel("Halaman Shift"));
 
         // Tambahkan ke mainPanel
@@ -111,5 +113,9 @@ public class DashboardFrame extends JFrame {
         label.setFont(new Font("Segoe UI", Font.BOLD, 24));
         panel.add(label, BorderLayout.CENTER);
         return panel;
+    }
+
+    public static void main(String[] args) {
+        new DashboardFrame().setVisible(true);
     }
 }

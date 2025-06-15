@@ -5,16 +5,8 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="ede4d537-bd05-444a-9c2f-e3d2da5b7d7d" name="Changes" comment="Initial commit">
-      <change afterPath="$PROJECT_DIR$/src/assets/dashboard.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/assets/logout.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/assets/produk.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/assets/shift.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/assets/struk.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/assets/transaksi.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/panels/StrukPanel.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Login/LoginFrame.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/Login/LoginFrame.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/assets/logo.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/DBConnection.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/database/DBConnection.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/DashboardFrame.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/DashboardFrame.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/stello_coffee.db" beforeDir="false" afterPath="$PROJECT_DIR$/stello_coffee.db" afterDir="false" />
     </list>
@@ -133,7 +125,23 @@
       <option name="project" value="LOCAL" />
       <updated>1748851857782</updated>
     </task>
-    <option name="localTasksCounter" value="5" />
+    <task id="LOCAL-00005" summary="Initial commit">
+      <option name="closed" value="true" />
+      <created>1750007558488</created>
+      <option name="number" value="00005" />
+      <option name="presentableId" value="LOCAL-00005" />
+      <option name="project" value="LOCAL" />
+      <updated>1750007558490</updated>
+    </task>
+    <task id="LOCAL-00006" summary="Initial commit">
+      <option name="closed" value="true" />
+      <created>1750007585099</created>
+      <option name="number" value="00006" />
+      <option name="presentableId" value="LOCAL-00006" />
+      <option name="project" value="LOCAL" />
+      <updated>1750007585100</updated>
+    </task>
+    <option name="localTasksCounter" value="7" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
