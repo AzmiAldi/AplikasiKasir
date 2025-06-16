@@ -1,9 +1,9 @@
 package panels;
 
 import database.DBConnection;
+import database.ShiftDatabaseHelper;
 import javax.swing.*;
 import javax.swing.border.*;
-import javax.swing.event.*;
 import javax.swing.table.*;
 import java.awt.*;
 import java.awt.event.*;
@@ -401,66 +401,120 @@ public class TransaksiPanel extends JPanel {
 
         // Simpan transaksi ke database
         int generatedId = -1;
-        try (Connection conn = DBConnection.getConnection()) {
-            // Simpan transaksi utama
-            PreparedStatement ps = conn.prepareStatement(
-                    "INSERT INTO transactions (datetime, total, bayar, kembalian, metode) " +
-                            "VALUES (datetime('now', 'localtime'), ?, ?, ?, ?)",
-                    Statement.RETURN_GENERATED_KEYS
-            );
-            ps.setDouble(1, totalAmount);
-            ps.setDouble(2, bayar);
-            ps.setDouble(3, kembalian);
-            ps.setString(4, selectedMethod);
-            ps.executeUpdate();
+        Connection conn = null;
+        try {
+            conn = DBConnection.getConnection();
+            conn.setAutoCommit(false); // Mulai transaksi
 
-            // Ambil ID transaksi yang baru dibuat
-            ResultSet rs = ps.getGeneratedKeys();
-            if (rs.next()) {
-                generatedId = rs.getInt(1);
+            // 1. Validasi shift aktif
+            int shiftId = ShiftDatabaseHelper.getActiveShiftId(conn);
+            if (shiftId == -1) {
+                JOptionPane.showMessageDialog(this,
+                        "Tidak ada shift aktif! Harap mulai shift terlebih dahulu.",
+                        "Error", JOptionPane.ERROR_MESSAGE);
+                return;
             }
 
-            // Simpan detail item transaksi
-            PreparedStatement psDetail = conn.prepareStatement(
-                    "INSERT INTO transaction_items (transaction_id, product_name, quantity, price) " +
-                            "VALUES (?, ?, ?, ?)"
-            );
+            // 2. Verifikasi shift ada di database
+            if (!ShiftDatabaseHelper.isShiftExist(conn, shiftId)) {
+                JOptionPane.showMessageDialog(this,
+                        "Shift tidak valid! ID: " + shiftId,
+                        "Error", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+
+            // 3. Simpan transaksi utama
+            String sql = "INSERT INTO transactions " +
+                    "(datetime, total, bayar, kembalian, metode, shift_id) " +
+                    "VALUES (datetime('now', 'localtime'), ?, ?, ?, ?, ?)";
+
+            try (PreparedStatement ps = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+                ps.setDouble(1, totalAmount);
+                ps.setDouble(2, bayar);
+                ps.setDouble(3, kembalian);
+                ps.setString(4, selectedMethod);
+                ps.setInt(5, shiftId); // Gunakan shiftId yang valid
+
+                int affectedRows = ps.executeUpdate();
+                if (affectedRows == 0) {
+                    throw new SQLException("Gagal menyimpan transaksi, tidak ada baris yang terpengaruh");
+                }
+
+                try (ResultSet rs = ps.getGeneratedKeys()) {
+                    if (rs.next()) {
+                        generatedId = rs.getInt(1);
+                    } else {
+                        throw new SQLException("Gagal mendapatkan ID transaksi");
+                    }
+                }
+            }
+            conn.commit(); // commit agar transaksi benar-benar tersimpan sebelum insert item
+
+            // 4. Simpan item transaksi
+            if (generatedId != -1) {
+                try (PreparedStatement psDetail = conn.prepareStatement(
+                        "INSERT INTO transaction_items (transaction_id, product_name, quantity, price) " +
+                                "VALUES (?, ?, ?, ?)")) {
+
+                    for (int i = 0; i < keranjangModel.getRowCount(); i++) {
+                        psDetail.setInt(1, generatedId);
+                        psDetail.setString(2, (String) keranjangModel.getValueAt(i, 0));
+                        psDetail.setInt(3, (int) keranjangModel.getValueAt(i, 1));
+                        psDetail.setDouble(4, (double) keranjangModel.getValueAt(i, 2) / (int) keranjangModel.getValueAt(i, 1));
+                        psDetail.addBatch();
+                    }
+                    psDetail.executeBatch();
+                }
+            } else {
+                throw new SQLException("Gagal menyimpan item transaksi karena ID transaksi tidak valid.");
+            }
+
+            // 5. Update total penjualan shift
+            ShiftDatabaseHelper.updateShiftSales(conn, shiftId, totalAmount);
+
+            conn.commit(); // Commit transaksi jika semua berhasil
+
+            // Siapkan data untuk struk
+            String trxId = "TRX-" + generatedId;
+            List<HashMap<String, Object>> items = new ArrayList<>();
             for (int i = 0; i < keranjangModel.getRowCount(); i++) {
-                psDetail.setInt(1, generatedId);
-                psDetail.setString(2, (String) keranjangModel.getValueAt(i, 0));
-                psDetail.setInt(3, (int) keranjangModel.getValueAt(i, 1));
-                psDetail.setDouble(4, (double) keranjangModel.getValueAt(i, 2) / (int) keranjangModel.getValueAt(i, 1));
-                psDetail.addBatch();
+                HashMap<String, Object> item = new HashMap<>();
+                item.put("nama", keranjangModel.getValueAt(i, 0));
+                item.put("jumlah", keranjangModel.getValueAt(i, 1));
+                item.put("harga", (double) keranjangModel.getValueAt(i, 2) / (int) keranjangModel.getValueAt(i, 1));
+                items.add(item);
             }
-            psDetail.executeBatch();
+
+            // Tampilkan struk
+            new ReceiptFrame(trxId, selectedMethod, items, totalAmount, bayar, kembalian).setVisible(true);
+
+            // Reset keranjang
+            keranjangModel.setRowCount(0);
+            updateSubtotal();
+
+            JOptionPane.showMessageDialog(this,
+                    "Transaksi berhasil disimpan.",
+                    "Sukses", JOptionPane.INFORMATION_MESSAGE);
+
         } catch (SQLException e) {
+            try {
+                if (conn != null) conn.rollback(); // Rollback jika error
+            } catch (SQLException ex) {
+                ex.printStackTrace();
+            }
             e.printStackTrace();
             JOptionPane.showMessageDialog(this,
                     "Gagal menyimpan transaksi: " + e.getMessage(),
                     "Error", JOptionPane.ERROR_MESSAGE);
-            return;
+        } finally {
+            try {
+                if (conn != null) {
+                    conn.setAutoCommit(true); // Kembalikan ke mode auto-commit
+                    conn.close();
+                }
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
         }
-
-        // Siapkan data untuk struk
-        String trxId = "TRX-" + generatedId;
-        List<HashMap<String, Object>> items = new ArrayList<>();
-        for (int i = 0; i < keranjangModel.getRowCount(); i++) {
-            HashMap<String, Object> item = new HashMap<>();
-            item.put("nama", keranjangModel.getValueAt(i, 0));
-            item.put("jumlah", keranjangModel.getValueAt(i, 1));
-            item.put("harga", (double) keranjangModel.getValueAt(i, 2) / (int) keranjangModel.getValueAt(i, 1));
-            items.add(item);
-        }
-
-        // Tampilkan struk
-        new ReceiptFrame(trxId, selectedMethod, items, totalAmount, bayar, kembalian).setVisible(true);
-
-        // Reset keranjang
-        keranjangModel.setRowCount(0);
-        updateSubtotal();
-
-        JOptionPane.showMessageDialog(this,
-                "Transaksi berhasil disimpan.",
-                "Sukses", JOptionPane.INFORMATION_MESSAGE);
     }
 }

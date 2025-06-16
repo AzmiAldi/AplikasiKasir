@@ -35,7 +35,7 @@ public class DashboardFrame extends JFrame {
         panelMap.put("produk", new panels.ProdukPanel());
         panelMap.put("transaksi", new panels.TransaksiPanel());
         panelMap.put("struk", new panels.StrukPanel());
-        panelMap.put("shift", createPagePanel("Halaman Shift"));
+        panelMap.put("shift", new panels.ShiftPanel());
 
         // Tambahkan ke mainPanel
         for (String key : panelMap.keySet()) {

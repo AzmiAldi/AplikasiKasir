@@ -5,17 +5,23 @@ import java.sql.*;
 public class DBConnection {
     private static Connection conn;
 
-    public static Connection getConnection() {
+    public static synchronized Connection getConnection() throws SQLException {
+        if (conn == null || conn.isClosed()) {
+            conn = DriverManager.getConnection("jdbc:sqlite:stello_coffee.db");
+            // Pastikan foreign key constraint diaktifkan untuk SQLite
+            conn.createStatement().execute("PRAGMA foreign_keys = ON");
+        }
+        return conn;
+    }
+
+    public static synchronized void closeConnection() {
         try {
-            if (conn == null || conn.isClosed()) {
-                String url = "jdbc:sqlite:stello_coffee.db";
-                conn = DriverManager.getConnection(url);
-                initializeDatabase();
+            if (conn != null && !conn.isClosed()) {
+                conn.close();
             }
         } catch (SQLException e) {
             e.printStackTrace();
         }
-        return conn;
     }
 
     // Initialize tables if not exist

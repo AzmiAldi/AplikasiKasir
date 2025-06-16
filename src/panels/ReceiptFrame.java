@@ -60,7 +60,7 @@ public class ReceiptFrame extends JFrame {
         JPanel infoPanel = new JPanel(new GridLayout(0, 2, 10, 5));
         infoPanel.setBackground(new Color(0, 0, 0, 0)); // Transparent
         addInfoRow(infoPanel, "No. Transaksi:", trxId);
-        addInfoRow(infoPanel, "Tanggal:", new SimpleDateFormat("dd/MM/yyyy HH:mm").format(new Date()));
+        addInfoRow(infoPanel, "Tanggal:", new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()));
         addInfoRow(infoPanel, "Metode:", selectedMethod);
         addInfoRow(infoPanel, "Kasir:", "Admin");
 
