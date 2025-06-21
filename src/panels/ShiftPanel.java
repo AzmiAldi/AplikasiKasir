@@ -8,6 +8,7 @@ import javax.swing.table.*;
 import java.awt.*;
 import java.awt.event.*;
 import java.sql.Connection;
+import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
@@ -97,10 +98,17 @@ public class ShiftPanel extends JPanel {
         btnEndShift = createModernButton("Akhiri Shift Aktif", WARNING_COLOR);
         btnEndShift.addActionListener(e -> endActiveShift());
 
+        JButton btnHapusShift = new JButton("Hapus Shift");
+        btnHapusShift.setBackground(new Color(220, 53, 69));
+        btnHapusShift.setForeground(Color.WHITE);
+        btnHapusShift.setFocusPainted(false);
+        btnHapusShift.addActionListener(e -> hapusShift());
+
         JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT, 15, 10));
         buttonPanel.setBackground(Color.WHITE);
         buttonPanel.add(btnStartShift);
         buttonPanel.add(btnEndShift);
+        buttonPanel.add(btnHapusShift);
 
         tablePanel.add(buttonPanel, BorderLayout.SOUTH);
         add(tablePanel, BorderLayout.CENTER);
@@ -273,4 +281,50 @@ public class ShiftPanel extends JPanel {
                     "Error", JOptionPane.ERROR_MESSAGE);
         }
     }
+
+    private void hapusShift() {
+        int selectedRow = shiftTable.getSelectedRow();
+        if (selectedRow == -1) {
+            JOptionPane.showMessageDialog(this, "Pilih shift yang ingin dihapus.", "Peringatan", JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+
+        int shiftId = (int) shiftTable.getValueAt(selectedRow, 0);
+
+        int confirm = JOptionPane.showConfirmDialog(this,
+                "Apakah Anda yakin ingin menghapus shift ini?",
+                "Konfirmasi Hapus", JOptionPane.YES_NO_OPTION);
+
+        if (confirm != JOptionPane.YES_OPTION) return;
+
+        try (Connection conn = DBConnection.getConnection()) {
+            // 1. Hapus item transaksi yang berkaitan
+            try (PreparedStatement ps1 = conn.prepareStatement(
+                    "DELETE FROM transaction_items WHERE transaction_id IN " +
+                            "(SELECT id FROM transactions WHERE shift_id = ?)")) {
+                ps1.setInt(1, shiftId);
+                ps1.executeUpdate();
+            }
+            // 2. Hapus transaksi terkait shift
+            try (PreparedStatement ps2 = conn.prepareStatement(
+                    "DELETE FROM transactions WHERE shift_id = ?")) {
+                ps2.setInt(1, shiftId);
+                ps2.executeUpdate();
+            }
+            // 3. Baru hapus shift
+            try (PreparedStatement ps3 = conn.prepareStatement(
+                    "DELETE FROM shifts WHERE id = ?")) {
+                ps3.setInt(1, shiftId);
+                ps3.executeUpdate();
+            }
+
+            JOptionPane.showMessageDialog(this, "Shift dan transaksi terkait berhasil dihapus.");
+            loadShiftData(); // refresh tabel shift
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+            JOptionPane.showMessageDialog(this, "Gagal menghapus shift: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+        }
+    }
+
 }

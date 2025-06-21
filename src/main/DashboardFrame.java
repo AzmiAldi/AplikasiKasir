@@ -31,7 +31,7 @@ public class DashboardFrame extends JFrame {
         panelMap = new HashMap<>();
 
         // Tambahkan halaman konten (dummy dulu)
-        panelMap.put("dashboard", createPagePanel("Halaman Dashboard"));
+        panelMap.put("dashboard", new panels.DashboardPanel());
         panelMap.put("produk", new panels.ProdukPanel());
         panelMap.put("transaksi", new panels.TransaksiPanel());
         panelMap.put("struk", new panels.StrukPanel());

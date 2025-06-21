@@ -5,16 +5,12 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="ede4d537-bd05-444a-9c2f-e3d2da5b7d7d" name="Changes" comment="Initial commit">
-      <change afterPath="$PROJECT_DIR$/src/database/ShiftDatabaseHelper.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/panels/ShiftPanel.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Main.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/Main.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/database/DBConnection.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/database/DBConnection.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Login/AuthController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/Login/AuthController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Login/LoginFrame.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/Login/LoginFrame.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/DashboardFrame.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/DashboardFrame.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/panels/ReceiptFrame.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/panels/ReceiptFrame.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/panels/ReceiptPanel.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/panels/ReceiptPanel.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/panels/ShiftPanel.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/panels/ShiftPanel.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/panels/StrukPanel.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/panels/StrukPanel.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/panels/TransaksiPanel.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/panels/TransaksiPanel.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/stello_coffee.db" beforeDir="false" afterPath="$PROJECT_DIR$/stello_coffee.db" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -156,7 +152,15 @@
       <option name="project" value="LOCAL" />
       <updated>1750010486703</updated>
     </task>
-    <option name="localTasksCounter" value="8" />
+    <task id="LOCAL-00008" summary="Initial commit">
+      <option name="closed" value="true" />
+      <created>1750054190927</created>
+      <option name="number" value="00008" />
+      <option name="presentableId" value="LOCAL-00008" />
+      <option name="project" value="LOCAL" />
+      <updated>1750054190929</updated>
+    </task>
+    <option name="localTasksCounter" value="9" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">

@@ -12,7 +12,7 @@ import java.util.*;
 import java.util.Date;
 import java.util.List;
 
-public class StrukPanel extends JPanel {
+public class    StrukPanel extends JPanel {
     private JTable tableStruk;
     private JPanel detailContainer;
     private JButton btnPrint;
